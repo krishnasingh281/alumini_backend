@@ -25,6 +25,7 @@ RUN python -m venv /py && \
         --disabled-password \
         --no-create-home \
         django-user
+RUN apk add --no-cache bash
 
 ENV PATH="/py/bin:$PATH"
 
