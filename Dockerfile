@@ -16,17 +16,22 @@ RUN python -m venv /py && \
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base mariadb-dev musl-dev && \
     /py/bin/pip install -r /tmp/requirements.txt && \
-    if [ $DEV = "true" ]; \
-        then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
+    if [ "$DEV" = "true" ]; then \
+        /py/bin/pip install -r /tmp/requirements.dev.txt ; \
     fi && \
     rm -rf /tmp && \
     apk del .tmp-build-deps && \
+    # Install bash and make it available to all users
+    apk add --no-cache bash && \
+    chmod +x /bin/bash && \
+    # Add non-root user
     adduser \
         --disabled-password \
         --no-create-home \
         django-user
-RUN apk add --no-cache bash
 
 ENV PATH="/py/bin:$PATH"
 
 USER django-user
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
