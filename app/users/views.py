@@ -60,7 +60,9 @@ class AdminOnlyView(generics.ListAPIView):
     serializer_class = UserSerializer
 
 # Protect an Alumni-only View
-class AlumniOnlyView(generics.RetrieveAPIView):
+class AlumniOnlyView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsAlumniUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    
+    

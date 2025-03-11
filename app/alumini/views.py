@@ -1,0 +1,35 @@
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from .models import AlumniProfile
+from .serializers import AlumniProfileSerializer
+
+class AlumniProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Retrieve the logged-in user's alumni profile"""
+        try:
+            profile = request.user.alumni_profile  # Fetch profile
+            serializer = AlumniProfileSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except AlumniProfile.DoesNotExist:
+            return Response({"error": "Alumni profile not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        """Create or update the alumni profile for the logged-in user"""
+        try:
+            profile = request.user.alumni_profile  # Check if profile exists
+            serializer = AlumniProfileSerializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)  # Change status to OK (Update)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except AlumniProfile.DoesNotExist:
+            # If no profile exists, create a new one
+            serializer = AlumniProfileSerializer(data={**request.data, "user": request.user.id})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)  # Change status to CREATED
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
