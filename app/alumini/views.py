@@ -2,8 +2,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 from .models import AlumniProfile
 from .serializers import AlumniProfileSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 class AlumniProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -33,3 +36,13 @@ class AlumniProfileView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)  # Change status to CREATED
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class AlumniListView(generics.ListAPIView):
+    queryset = AlumniProfile.objects.all()
+    serializer_class = AlumniProfileSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+
+    # Define filter fields
+    filterset_fields = ['current_company', 'job_title', 'graduation_year']
+    search_fields = ['user__username', 'current_company', 'job_title', 'bio']
+    ordering_fields = ['graduation_year']

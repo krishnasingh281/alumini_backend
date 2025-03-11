@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
-    'alumini',
     'events',
+    'django_filters',
     'rest_framework',
+    'alumini.apps.AluminiConfig',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

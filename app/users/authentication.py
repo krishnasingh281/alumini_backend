@@ -7,8 +7,8 @@ class CustomAccessToken(AccessToken):
         # Example: Different lifetimes for different user roles
         user_role = self.payload.get("role", "user") 
         if user_role == "admin":
-            return timedelta(minutes=3) 
+            return timedelta(hours=3) 
         elif user_role == "alumni":
-            return timedelta(minutes=2)  
+            return timedelta(hours=1)  
         else:
-            return timedelta(minutes=1) 
+            return timedelta(hours=1) 

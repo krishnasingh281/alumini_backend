@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer, UserSerializer
 from .models import User
+from alumini.models import AlumniProfile
 
 # Register API
 class RegisterView(generics.CreateAPIView):
@@ -16,7 +17,9 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-
+        
+        # No need to create AlumniProfile here - it's handled in the serializer
+        
         refresh = RefreshToken.for_user(user)
 
         return Response({

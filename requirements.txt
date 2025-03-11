@@ -4,3 +4,5 @@ djangorestframework-simplejwt
 mysqlclient
 pymysql
 pillow
+django-filter
+drf-yasg
