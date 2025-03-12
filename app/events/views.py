@@ -1,9 +1,10 @@
-from rest_framework import viewsets
+from rest_framework import generics
 from rest_framework.permissions import IsAdminUser
 from .models import Event
 from .serializers import EventsSerializer
+from .permissions import IsAlumniOrStudent
 
-class EventViewSet(viewsets.ModelViewSet):
+class EventViewSet(generics.ListAPIView):
     queryset = Event.objects.all()
     serializer_class = EventsSerializer
-    permission_classes = [IsAdminUser]  # Only Admins can CRUD
+    
