@@ -68,4 +68,48 @@ class AlumniOnlyView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
-    
+
+import pandas as pd
+from rest_framework import status, permissions, views
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import User
+from .serializers import UserSerializer
+
+class BulkUploadAlumniView(views.APIView):
+    permission_classes = [permissions.IsAdminUser]  # 🚀 Only Admins can use this
+    parser_classes = [MultiPartParser, FormParser]  # 🚀 Handle file uploads
+
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get("file")  
+        if not file:
+            return Response({"error": "No file uploaded"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            df = pd.read_excel(file)  # 📥 Read Excel file
+            required_columns = ["username", "email", "graduation_year", "current_company"]
+            
+            if not all(col in df.columns for col in required_columns):
+                return Response({"error": "Invalid file format. Required columns: username, email, graduation_year, current_company"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # 🚀 Process each row and create users
+            created_users = []
+            for _, row in df.iterrows():
+                user_data = {
+                    "username": row["username"],
+                    "email": row["email"],
+                    "role": "alumni",  # Ensure role is set
+                    "graduation_year": row["graduation_year"],
+                    "current_company": row["current_company"],
+                }
+                serializer = UserSerializer(data=user_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    created_users.append(serializer.data)
+                else:
+                    return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"message": "Alumni added successfully", "users": created_users}, status=status.HTTP_201_CREATED)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

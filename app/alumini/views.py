@@ -46,3 +46,14 @@ class AlumniListView(generics.ListAPIView):
     filterset_fields = ['current_company', 'job_title', 'graduation_year']
     search_fields = ['user__username', 'current_company', 'job_title', 'bio']
     ordering_fields = ['graduation_year']
+    
+from django.http import FileResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from .utils import generate_alumni_pdf  # Import the function
+
+@staff_member_required  # Only admins can access this
+def export_alumni_pdf(request):
+    """API to export alumni data as a PDF"""
+    pdf_buffer = generate_alumni_pdf()
+    return FileResponse(pdf_buffer, as_attachment=True, filename="alumni_list.pdf")
+

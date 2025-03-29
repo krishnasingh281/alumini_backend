@@ -6,3 +6,6 @@ pymysql
 pillow
 django-filter
 drf-yasg
+reportlab
+openpyxl
+pandas

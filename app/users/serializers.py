@@ -6,9 +6,11 @@ from alumini.models import AlumniProfile  # Import AlumniProfile
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.ChoiceField(choices=[("alumni", "Alumni"), ("student", "Student")]) 
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
+        fields = ["username", "email", "password", "role", "graduation_year", "current_company"]
         read_only_fields = ('id',)
 
 class RegisterSerializer(serializers.ModelSerializer):
