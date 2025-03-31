@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from alumini.models import AlumniProfile  # Import AlumniProfile
+from django.contrib.auth import authenticate
 
 User = get_user_model()
 
@@ -69,3 +70,30 @@ class RegisterSerializer(serializers.ModelSerializer):
                 # raise serializers.ValidationError({"alumni_profile": str(e)})
 
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    username_or_email = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        """Authenticate user using either username or email"""
+        username_or_email = data.get("username_or_email")
+        password = data.get("password")
+
+        # Check if user exists with email
+        user = User.objects.filter(email=username_or_email).first()
+        if user is None:
+            # If no user found with email, check by username
+            user = User.objects.filter(username=username_or_email).first()
+
+        if user is None:
+            raise serializers.ValidationError({"username_or_email": "User not found"})
+
+        # Authenticate user
+        user = authenticate(username=user.username, password=password)
+        if user is None:
+            raise serializers.ValidationError({"password": "Incorrect password"})
+
+        data["user"] = user  # Add the authenticated user to validated data
+        return data

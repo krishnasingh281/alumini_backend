@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
 from .models import User
 from alumini.models import AlumniProfile
 
@@ -27,7 +27,30 @@ class RegisterView(generics.CreateAPIView):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
+        
+        
+class LoginView(generics.GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = LoginSerializer
 
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            tokens = RefreshToken.for_user(user)
+            return Response({
+                "refresh": str(tokens),
+                "access": str(tokens.access_token),
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "role": user.role
+                }
+            })
+        else:
+            print("🚨 Validation Errors:", serializer.errors)  # Debugging
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 #  Login API
 @api_view(['POST'])
 @permission_classes([AllowAny])

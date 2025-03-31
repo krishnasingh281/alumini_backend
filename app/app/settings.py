@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-h0v9u2sz))%n5r^fkjtzcgxpn6dm$5&d!0t$=!nib@n1o+px%y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'alumini.apps.AluminiConfig',
     'drf_yasg',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -55,10 +56,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'app.middleware.DisableAdminLoggingMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = 'app.urls'
 AUTH_USER_MODEL = 'users.User'
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 TEMPLATES = [
