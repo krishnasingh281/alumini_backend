@@ -36,7 +36,7 @@ class User(AbstractUser):
 
     email = models.EmailField(unique=True)  # Make email unique
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
-
+    graduation_year = models.IntegerField(null=True, blank=True)
     objects = UserManager()  # Use the custom manager
 
     REQUIRED_FIELDS = ['email', 'role']  # Required for createsuperuser

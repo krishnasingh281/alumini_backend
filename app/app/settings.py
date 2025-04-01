@@ -140,7 +140,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+
+
+# In your app/app/settings.py or wherever your Django settings are located
+
+# Add or modify these settings
+STATIC_URL = '/static/'
+STATIC_ROOT = '/vol/web/static'  # This matches the volume mounted in your docker-compose-deploy.yml
+
+# Optional but recommended for your setup
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/vol/web/media'
+
+STATICFILES_DIRS = [
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -162,4 +175,8 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,  # You can change this to any number you want
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
