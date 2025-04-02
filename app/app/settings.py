@@ -153,6 +153,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = '/vol/web/media'
 
 STATICFILES_DIRS = [
+    BASE_DIR / "static",
 ]
 
 # Default primary key field type
