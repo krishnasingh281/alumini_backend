@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'events',
+    'blog',
     'django_filters',
     'rest_framework',
     'alumini.apps.AluminiConfig',
@@ -153,7 +154,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = '/vol/web/media'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    
 ]
 
 # Default primary key field type
@@ -165,6 +166,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     
 }
@@ -180,4 +182,11 @@ REST_FRAMEWORK = {
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
