@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
     - static-data:/vol/web
+    - app-logs:/app/logs
     environment:
       - DB_HOST=db
       - DB_NAME=${DB_NAME}
@@ -15,19 +16,16 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "
-             # Wait for database to be ready
-             echo 'Waiting for database to be ready...'
+      sh -c "echo 'Waiting for database to be ready...' &&
              while ! python -c \"import MySQLdb; MySQLdb.connect(host='$DB_HOST', user='$DB_USER', password='$DB_PASS', database='$DB_NAME')\" 2>/dev/null; do
-               echo 'Database not ready yet, waiting...'
-               sleep 1
-             done
-             echo 'Database is ready!'
-             
+               echo 'Database not ready yet, waiting...' &&
+               sleep 1;
+             done &&
+             echo 'Database is ready!' &&
              python manage.py migrate &&
              python manage.py collectstatic --noinput &&
-             uwsgi --socket :8000 --workers 4 --master --enable-threads --module app.wsgi"
-
+             uwsgi --socket :9000 --workers 4 --master --enable-threads --module app.wsgi"
+             
   db:
     image: mysql:8.0
     restart: always
@@ -38,6 +36,7 @@ services:
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASS}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    command: --default-authentication-plugin=mysql_native_password --innodb-flush-method=O_DSYNC --innodb-use-native-aio=0
 
   proxy:
     build:
@@ -53,3 +52,4 @@ services:
 volumes:
   mysql-data:
   static-data:
+  app-logs:
