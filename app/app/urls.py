@@ -40,6 +40,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('alumni/', include('alumini.urls')),
     path('events/', include('events.urls')),
+    path('blogs/', include('blog.urls')),
     # Swagger UI
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     
