@@ -13,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["username", "email", "password", "role", "graduation_year"]
         read_only_fields = ('id',)
+        ref_name = 'BlogAppUser'
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
