@@ -25,7 +25,7 @@ from drf_yasg import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="Alumni API",
-        default_version='v1',
+        default_version='v2',
         description="API documentation for the Alumni Project",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="support@yourdomain.com"),
@@ -40,10 +40,11 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('alumni/', include('alumini.urls')),
     path('events/', include('events.urls')),
-    path('blogs/', include('blog.urls')),
+    path('blog/', include('blog.urls')),
     # Swagger UI
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     
     # ReDoc UI (Optional)
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
 ]
