@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     build:
@@ -8,9 +10,17 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+      - DEBUG=1
+    depends_on:
+      - db
+    # For development, still use runserver instead of uWSGI
     command: >
       sh -c "
-             # Simple wait script
              echo 'Waiting for database to be ready...'
              while ! python -c 'import MySQLdb; MySQLdb.connect(host=\"db\", user=\"devuser\", password=\"changeme\", database=\"devdb\")' 2>/dev/null; do
                echo 'Database not ready yet, waiting...'
@@ -20,14 +30,6 @@ services:
              
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
-    environment:
-      - DB_HOST=db
-      - DB_NAME=devdb
-      - DB_USER=devuser
-      - DB_PASS=changeme
-      - DEBUG=1
-    depends_on:
-      - db
 
   db:
     image: mysql:8.0

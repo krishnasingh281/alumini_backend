@@ -2,7 +2,7 @@ server {
     listen ${LISTEN_PORT};
 
     location /static {
-    alias /vol/web/static; 
+        alias /vol/web/static; 
     }
 
     location / {
@@ -11,4 +11,3 @@ server {
         client_max_body_size    10M;
     }
 }
-

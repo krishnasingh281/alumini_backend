@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bullseye
+FROM python:3.9-alpine3.18
 LABEL maintainer="alumini.com"
 
 ENV PYTHONUNBUFFERED=1
@@ -13,7 +13,7 @@ EXPOSE 8000
 ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
-    apk add --update --no-cache mysql-client mariadb-connector-c-dev && \
+    apk add --update --no-cache mysql-client mariadb-connector-c && \
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base mariadb-dev musl-dev linux-headers && \
     /py/bin/pip install -r /tmp/requirements.txt && \
@@ -39,8 +39,4 @@ RUN mkdir -p /vol/web/static && \
 
 USER django-user
 
-# Choose one of these CMD options based on your needs:
-# Option 1: If run.sh should be your entrypoint script
 CMD ["run.sh"]
-# Option 2: If you want to run the Django server directly
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

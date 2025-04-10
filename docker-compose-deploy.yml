@@ -18,6 +18,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # Keep using the existing approach with the inline script
     command: >
       sh -c "
          # Simple wait script
