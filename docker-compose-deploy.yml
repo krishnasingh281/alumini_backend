@@ -1,11 +1,13 @@
+version: '3.8'
+
 services:
   app:
     build:
       context: .
     restart: always
     volumes:
-    - static-data:/vol/web
-    - app-logs:/app/logs
+      - static-data:/vol/web
+      - app-logs:/app/logs
     environment:
       - DB_HOST=db
       - DB_NAME=${DB_NAME}
@@ -14,14 +16,10 @@ services:
       - SECRET_KEY=${DJANGO_SECRET_KEY}
       - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     command: >
-      sh -c "echo 'Waiting for database to be ready...' &&
-             while ! python -c \"import MySQLdb; MySQLdb.connect(host='$DB_HOST', user='$DB_USER', password='$DB_PASS', database='$DB_NAME')\" 2>/dev/null; do
-               echo 'Database not ready yet, waiting...' &&
-               sleep 1;
-             done &&
-             echo 'Database is ready!' &&
+      sh -c "/scripts/wait-for-db.sh &&
              python manage.py migrate &&
              python manage.py collectstatic --noinput &&
              uwsgi --socket :9000 --workers 4 --master --enable-threads --module app.wsgi"
@@ -37,6 +35,12 @@ services:
       - MYSQL_PASSWORD=${DB_PASS}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     command: --default-authentication-plugin=mysql_native_password --innodb-flush-method=O_DSYNC --innodb-use-native-aio=0
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USER}", "-p${DB_PASS}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   proxy:
     build:
@@ -45,9 +49,9 @@ services:
     depends_on:
       - app
     ports:
-      - 8000:8000
+      - 80:8000
     volumes:
-    - static-data:/vol/web
+      - static-data:/vol/web
 
 volumes:
   mysql-data:
