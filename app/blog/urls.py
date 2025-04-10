@@ -12,7 +12,7 @@ urlpatterns = [
     path('posts/<int:pk>/publish/', views.BlogPostPublish.as_view(), name='post-publish'),
     path('posts/<int:pk>/comments/', views.BlogPostAddComment.as_view(), name='post-add-comment'),
     
-    # Comment URLs
+    # Comment URL
     path('comments/', views.CommentList.as_view(), name='comment-list'),
     path('comments/<int:pk>/', views.CommentDetail.as_view(), name='comment-detail'),
 ]
