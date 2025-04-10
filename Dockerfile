@@ -1,4 +1,4 @@
-FROM python:3.9-alpine3.13
+FROM python:3.11-slim-bullseye
 LABEL maintainer="alumini.com"
 
 ENV PYTHONUNBUFFERED=1

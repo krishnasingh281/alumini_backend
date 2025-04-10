@@ -1,4 +1,4 @@
-FROM nginxinc/nginx-unprivileged:1-alpine
+FROM nginxinc/nginx-unprivileged:1.25.2-alpine
 LABEL maintainer="alumini.com"
 
 COPY ./default.conf.tpl /etc/nginx/default.conf.tpl
