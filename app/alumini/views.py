@@ -76,8 +76,6 @@ class AlumniProfileView(APIView):
 class AlumniListView(generics.ListAPIView):
     queryset = AlumniProfile.objects.all()
     serializer_class = AlumniProfileSerializer
-    authentication_classes = [JWTAuthentication, SessionAuthentication]  # Added authentication classes
-    permission_classes = [IsAuthenticated]  # Added permission class
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
     # Define filter fields
