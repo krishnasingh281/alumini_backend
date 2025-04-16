@@ -30,6 +30,7 @@ class BlogPostList(generics.ListCreateAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostListSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category']
     search_fields = ['title', 'content']
     ordering_fields = ['created_at', 'updated_at', 'published_at']
     authentication_classes = [JWTAuthentication]
