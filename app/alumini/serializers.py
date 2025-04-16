@@ -16,16 +16,25 @@ class UserBasicSerializer(serializers.ModelSerializer):
 
 class AlumniProfileSerializer(serializers.ModelSerializer):
     user_details = UserBasicSerializer(source='user', read_only=True)
+    profile_picture = serializers.ImageField(required=False, allow_null=True)
     
     class Meta:
         model = AlumniProfile
         fields = [
             'id', 'user', 'user_details', 'graduation_year', 
             'current_company', 'job_title', 'bio', 
+            'department', 'location',  # Added new fields
             'linkedin_url', 'profile_picture'
         ]
         extra_kwargs = {
             'user': {'write_only': True, 'required': False},  # Hide user ID in responses
+            'graduation_year': {'required': True},  # Explicitly mark as required
+            'current_company': {'required': False},
+            'job_title': {'required': False},
+            'bio': {'required': False},
+            'department': {'required': False},
+            'location': {'required': False},
+            'linkedin_url': {'required': False},
             'profile_picture': {'required': False}
         }
         

@@ -11,10 +11,12 @@ from drf_yasg.utils import swagger_auto_schema
 from users.permissions import IsAlumniUser
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 class AlumniProfileView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication, SessionAuthentication]  # Added authentication classes
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]  # Add parsers for handling file uploads
 
     @swagger_auto_schema(
         operation_description="Retrieve the logged-in user's alumni profile",
@@ -76,11 +78,13 @@ class AlumniProfileView(APIView):
 class AlumniListView(generics.ListAPIView):
     queryset = AlumniProfile.objects.all()
     serializer_class = AlumniProfileSerializer
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
-    # Define filter fields
+    # Define filter fields - now includes department and location
     filterset_fields = ['current_company', 'job_title', 'graduation_year', 'department', 'location']
-    search_fields = ['user__username', 'current_company', 'job_title', 'bio']
+    search_fields = ['user__username', 'current_company', 'job_title', 'bio', 'department', 'location']
     ordering_fields = ['graduation_year']
     
 from django.http import FileResponse
