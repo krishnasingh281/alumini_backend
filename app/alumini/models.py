@@ -7,6 +7,8 @@ class AlumniProfile(models.Model):
     current_company = models.CharField(max_length=255, blank=True, null=True)
     job_title = models.CharField(max_length=255, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
+    department = models.CharField(max_length=255, blank=True, null=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
     linkedin_url = models.URLField(blank=True, null=True)
     profile_picture = models.ImageField(upload_to="alumni/profile_pictures/", blank=True, null=True)
 

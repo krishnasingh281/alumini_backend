@@ -79,7 +79,7 @@ class AlumniListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
     # Define filter fields
-    filterset_fields = ['current_company', 'job_title', 'graduation_year']
+    filterset_fields = ['current_company', 'job_title', 'graduation_year', 'department', 'location']
     search_fields = ['user__username', 'current_company', 'job_title', 'bio']
     ordering_fields = ['graduation_year']
     
