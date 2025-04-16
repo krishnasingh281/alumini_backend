@@ -51,32 +51,7 @@ class LoginView(generics.GenericAPIView):
         else:
             print("🚨 Validation Errors:", serializer.errors)  # Debugging
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#  Login API
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def login_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
 
-    if not username or not password:
-        return Response({'error': 'Both username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-    user = authenticate(username=username, password=password)
-
-    if user is not None:
-        if not user.is_active:
-            return Response({'error': 'User account is disabled'}, status=status.HTTP_403_FORBIDDEN)
-
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'user': UserSerializer(user).data,
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }, status=status.HTTP_200_OK)
-
-    return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAdminUser, IsAlumniUser, IsStudentUser
 
 #  Protect an Admin-only View
@@ -97,7 +72,7 @@ from rest_framework import status, permissions, views
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, RegisterSerializer
 
 class BulkUploadAlumniView(views.APIView):
     permission_classes = [permissions.IsAdminUser]  # 🚀 Only Admins can use this
@@ -122,13 +97,27 @@ class BulkUploadAlumniView(views.APIView):
                     "username": row["username"],
                     "email": row["email"],
                     "role": "alumni",  # Ensure role is set
+                    "password": "temppassword123",  # Set temporary password
+                    "password2": "temppassword123",  # Confirm password
                     "graduation_year": row["graduation_year"],
-                    "current_company": row["current_company"],
                 }
-                serializer = UserSerializer(data=user_data)
+                
+                # Use the RegisterSerializer to ensure all validation and profile creation
+                serializer = RegisterSerializer(data=user_data)
                 if serializer.is_valid():
-                    serializer.save()
-                    created_users.append(serializer.data)
+                    user = serializer.save()
+                    
+                    # Update additional alumni profile fields
+                    try:
+                        profile = AlumniProfile.objects.get(user=user)
+                        profile.current_company = row["current_company"]
+                        if "job_title" in row:
+                            profile.job_title = row["job_title"]
+                        profile.save()
+                    except AlumniProfile.DoesNotExist:
+                        pass
+                        
+                    created_users.append(UserSerializer(user).data)
                 else:
                     return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -136,3 +125,5 @@ class BulkUploadAlumniView(views.APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+

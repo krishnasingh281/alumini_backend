@@ -23,6 +23,7 @@ class UserManager(BaseUserManager):
         """Create and return a superuser with admin role."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', 'admin')  # Set role to 'admin' for superusers
 
         return self.create_user(username, email, password, **extra_fields)
 
@@ -36,11 +37,10 @@ class User(AbstractUser):
 
     email = models.EmailField(unique=True)  # Make email unique
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
-    graduation_year = models.IntegerField(null=True, blank=True)
+    # Removed graduation_year field from here - now only in AlumniProfile
     objects = UserManager()  # Use the custom manager
 
     REQUIRED_FIELDS = ['email', 'role']  # Required for createsuperuser
 
     def __str__(self):
         return f"{self.username} ({self.role})"
-

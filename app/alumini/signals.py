@@ -1,5 +1,3 @@
-# alumini/signals.py (create this file)
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -15,8 +13,8 @@ def create_alumni_profile(sender, instance, created, **kwargs):
         try:
             # Check if profile already exists
             if not hasattr(instance, 'alumni_profile'):
-                # Set default graduation year to 2020 for testing
-                AlumniProfile.objects.create(user=instance, graduation_year=2020)
+                # Create alumni profile with default graduation year (you should update this)
+                AlumniProfile.objects.create(user=instance, graduation_year=instance.graduation_year)
                 print(f"Signal: Created AlumniProfile for {instance.username}")
         except Exception as e:
             print(f"Signal Error: {str(e)}")

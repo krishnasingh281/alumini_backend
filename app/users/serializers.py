@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "email", "password", "role", "graduation_year"]
+        fields = ["username", "email", "password", "role"]
         read_only_fields = ('id',)
         ref_name = 'BlogAppUser'
 
@@ -21,17 +21,12 @@ class RegisterSerializer(serializers.ModelSerializer):
     )
     password2 = serializers.CharField(write_only=True, required=True)
     
-    # Add alumni profile fields when needed
+    # Only include graduation_year for alumni role validation
     graduation_year = serializers.IntegerField(required=False, write_only=True)
-    current_company = serializers.CharField(required=False, write_only=True, allow_blank=True)
-    job_title = serializers.CharField(required=False, write_only=True, allow_blank=True)
-    bio = serializers.CharField(required=False, write_only=True, allow_blank=True)
-    linkedin_url = serializers.URLField(required=False, write_only=True, allow_blank=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'password2', 'role', 
-                  'graduation_year', 'current_company', 'job_title', 'bio', 'linkedin_url')
+        fields = ('id', 'username', 'email', 'password', 'password2', 'role', 'graduation_year')
         extra_kwargs = {'email': {'required': True}}
 
     def validate(self, data):
@@ -44,31 +39,36 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'graduation_year': 'Graduation year is required for alumni'})
             
         return data
+    
+    def validate_graduation_year(self, value):
+        import datetime
+        current_year = datetime.datetime.now().year
+        if value > current_year:
+            raise serializers.ValidationError("Graduation year cannot be in the future")
+        if value < 1900:
+            raise serializers.ValidationError("Please enter a valid graduation year")
+        return value
 
     def create(self, validated_data):
         validated_data.pop('password2')  # Remove password2
         
-        # Extract alumni profile data
-        alumni_fields = {}
-        for field in ['graduation_year', 'current_company', 'job_title', 'bio', 'linkedin_url']:
-            if field in validated_data:
-                alumni_fields[field] = validated_data.pop(field)
+        # Extract graduation_year for alumni profile
+        graduation_year = None
+        if 'graduation_year' in validated_data:
+            graduation_year = validated_data.pop('graduation_year')  # Remove from data going to User model
         
         password = validated_data.pop('password')  # Extract password
-        user = User(**validated_data)
+        user = User(**validated_data)  # Create user without graduation_year
         user.set_password(password)  # Hash password properly
         user.save()
 
         # Create alumni profile if role is alumni
-        if user.role == 'alumni':
+        if user.role == 'alumni' and graduation_year:
             try:
-                AlumniProfile.objects.create(user=user, **alumni_fields)
-                print(f"AlumniProfile created for {user.username} with graduation year: {alumni_fields.get('graduation_year')}")
+                AlumniProfile.objects.create(user=user, graduation_year=graduation_year)
+                print(f"AlumniProfile created for {user.username} with graduation year: {graduation_year}")
             except Exception as e:
                 print(f"Error creating AlumniProfile: {str(e)}")
-                # You might want to delete the user if profile creation fails
-                # user.delete()
-                # raise serializers.ValidationError({"alumni_profile": str(e)})
 
         return user
 
