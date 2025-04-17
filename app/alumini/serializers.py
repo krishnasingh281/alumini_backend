@@ -21,13 +21,15 @@ class AlumniProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlumniProfile
         fields = [
-            'id', 'user', 'user_details', 'graduation_year', 
+            'id', 'user', 'user_details', 'first_name', 'last_name', 'graduation_year', 
             'current_company', 'job_title', 'bio', 
             'department', 'location',  # Added new fields
             'linkedin_url', 'profile_picture'
         ]
         extra_kwargs = {
-            'user': {'write_only': True, 'required': False},  # Hide user ID in responses
+            'user': {'write_only': True, 'required': False},
+            'first_name': {'required': True},  # Explicitly mark as required
+            'last_name': {'required': True},  # Explicitly mark as required
             'graduation_year': {'required': True},  # Explicitly mark as required
             'current_company': {'required': False},
             'job_title': {'required': False},

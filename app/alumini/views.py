@@ -78,8 +78,6 @@ class AlumniProfileView(APIView):
 class AlumniListView(generics.ListAPIView):
     queryset = AlumniProfile.objects.all()
     serializer_class = AlumniProfileSerializer
-    authentication_classes = [JWTAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
 
     # Define filter fields - now includes department and location

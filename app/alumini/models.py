@@ -3,6 +3,8 @@ from django.conf import settings
 
 class AlumniProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="alumni_profile")
+    first_name = models.CharField(max_length=255,null=True, blank=True)
+    last_name = models.CharField(max_length=255,null=True, blank=True)
     graduation_year = models.IntegerField()
     current_company = models.CharField(max_length=255, blank=True, null=True)
     job_title = models.CharField(max_length=255, blank=True, null=True)
