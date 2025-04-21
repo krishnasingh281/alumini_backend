@@ -58,14 +58,12 @@ services:
       - app
     ports:
       - 80:8000
-      - 443:443  # Add HTTPS port
+      - 443:443
     volumes:
       - static-data:/vol/web
-      - media-data:/vol/media
-      - ./ssl:/etc/nginx/ssl  # Add SSL certificate volume
+      - ./ssl:/etc/nginx/ssl
 
 volumes:
   mysql-data:
   static-data:
-  media-data:
   app-logs:
